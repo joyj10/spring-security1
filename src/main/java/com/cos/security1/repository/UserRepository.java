@@ -3,6 +3,8 @@ package com.cos.security1.repository;
 import com.cos.security1.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Optional;
+
 /**
  * UserRepository
  * <pre>
@@ -15,4 +17,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 // CRUD 함수를 JpaRepository 들고 있음
 // @Repository 어노테이션 없어도 IoC 됨. 이유는 JpaRepository 상속 했기 때문에
 public interface UserRepository extends JpaRepository<User, Integer> {
+    Optional<User> findByUsername(String username);
+    Optional<User> findByEmail(String email);
 }
