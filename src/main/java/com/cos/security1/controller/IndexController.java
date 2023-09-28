@@ -1,7 +1,12 @@
 package com.cos.security1.controller;
 
+import com.cos.security1.model.User;
+import com.cos.security1.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
@@ -14,7 +19,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
  */
 
 @Controller // View Return
+@RequiredArgsConstructor
 public class IndexController {
+
+    private final UserRepository userRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+
     @GetMapping({"","/"})
     public String index() {
         // 머스테치 기본 폴더 src/main/resources/
@@ -37,20 +47,28 @@ public class IndexController {
         return "manager";
     }
 
-    // 스프링 시큐리티 해당 주소 낚아챔 - SecurityConfig 파일 세팅 후 낚아채는 현상 사라짐
-    @GetMapping("/login")
-    public @ResponseBody String login() {
-        return "login";
+    // login path 스프링 시큐리티 해당 주소 낚아챔 - SecurityConfig 파일 세팅 후 낚아채는 현상 사라짐
+    @GetMapping("/loginForm")
+    public String loginForm() {
+        return "loginForm";
     }
 
-    @GetMapping("/join")
-    public @ResponseBody String join() {
-        return "join";
+    @GetMapping("/joinForm")
+    public String joinForm() {
+        return "joinForm";
     }
 
-    @GetMapping("/joinProc")
-    public @ResponseBody String joinProc() {
-        return "회원가입 완료됨!";
+    @PostMapping("/join")
+    public String join(User user) {
+        user.setRole("ROLE_USER");
+        user.setPassword(encodePassword(user.getPassword()));
+        userRepository.save(user); // 회원 가입은 잘됨, but, 비밀번호 암호화 되지 않아 시큐리티 로그인 할 수 없음
+        return "redirect:/loginForm";
     }
+
+    private String encodePassword(String password) {
+        return bCryptPasswordEncoder.encode(password);
+    }
+
 
 }
