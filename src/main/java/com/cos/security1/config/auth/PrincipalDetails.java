@@ -6,7 +6,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 
 /**
  * PrincipalDetails
@@ -29,20 +28,16 @@ public class PrincipalDetails  implements UserDetails {
     private User user; // 콤포지션
 
     public PrincipalDetails(User user) {
+        super();
         this.user = user;
     }
 
     // 해당 User의 권한을 리턴하는 곳
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        Collection<GrantedAuthority> collection = new ArrayList<>();
-        collection.add(new GrantedAuthority() {
-            @Override
-            public String getAuthority() {
-                return user.getRole();
-            }
-        });
-        return Collections.emptyList();
+        Collection<GrantedAuthority> authCollection = new ArrayList<>();
+        authCollection.add(()-> user.getRole());
+        return authCollection;
     }
 
     @Override
