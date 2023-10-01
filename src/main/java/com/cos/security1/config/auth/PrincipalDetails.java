@@ -1,11 +1,14 @@
 package com.cos.security1.config.auth;
 
 import com.cos.security1.model.User;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * PrincipalDetails
@@ -24,12 +27,21 @@ import java.util.Collection;
 
 // 시큐리티가 가지고 있는 Security Session => Authentication => UserDetails
 
-public class PrincipalDetails  implements UserDetails {
+public class PrincipalDetails  implements UserDetails, OAuth2User {
+    @Getter
     private User user; // 콤포지션
+    private Map<String, Object> attributes;
 
+    // 일반 로그인
     public PrincipalDetails(User user) {
         super();
         this.user = user;
+    }
+
+    // OAuth 로그인
+    public PrincipalDetails(User user, Map<String, Object> attributes) {
+        this.user = user;
+        this.attributes = attributes;
     }
 
     // 해당 User의 권한을 리턴하는 곳
@@ -70,5 +82,16 @@ public class PrincipalDetails  implements UserDetails {
         // 우리 사이트! 1년 동안 로그인은 안한 경우 휴먼 계정으로 하기로 함
         // 현재 시간 - 로긴 시간  => 1년 초과 시 return false;
         return true;
+    }
+
+    // OAuth2User Override method
+    @Override
+    public Map<String, Object> getAttributes() {
+        return attributes;
+    }
+
+    @Override
+    public String getName() {
+        return String.valueOf(attributes.get("sub"));
     }
 }
